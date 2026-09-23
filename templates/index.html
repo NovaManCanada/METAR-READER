@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAR Reader</title>
+    <style>
+        body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+        h1 { font-size: 1.5rem; }
+        form { display: flex; gap: 8px; margin-bottom: 24px; }
+        input[type=text] { flex: 1; padding: 8px; font-size: 1rem; text-transform: uppercase; }
+        button { padding: 8px 16px; font-size: 1rem; cursor: pointer; }
+        .error { color: #b00020; margin-bottom: 16px; }
+        .summary { font-size: 1.2rem; background: #f0f6ff; padding: 16px; border-radius: 8px; }
+        .raw { font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all; }
+        .details { margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <h1>METAR Reader</h1>
+    <p>Enter an airport code (e.g. KJFK, EGLL) to get a plain-English weather report.</p>
+
+    <form action="/metar" method="get">
+        <input type="text" name="airport_code" placeholder="Airport code" value="{{ airport_code }}" maxlength="4" required autofocus>
+        <button type="submit">Get Weather</button>
+    </form>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if result %}
+        <div class="summary">
+            <strong>{{ result.decoded.station }}</strong>
+            {% if result.decoded.observed_at %}&mdash; observed {{ result.decoded.observed_at }}{% endif %}
+            <p>{{ result.decoded.summary_sentence }}</p>
+        </div>
+        <div class="details">
+            <p><em>Raw METAR:</em></p>
+            <p class="raw">{{ result.raw }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
