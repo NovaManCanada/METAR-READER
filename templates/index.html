@@ -8,7 +8,9 @@
     <style>
         body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
         h1 { font-size: 1.5rem; text-align: center; }
-        form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+        .input-box { background: #f5f0fb; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        .input-box label { display: block; font-weight: bold; margin-bottom: 8px; }
+        form { display: flex; flex-direction: column; gap: 8px; }
         input[type=text] { padding: 8px; font-size: 1rem; text-transform: uppercase; text-align: left; }
         button { padding: 8px 16px; font-size: 1rem; cursor: pointer; background: #0b5fff; color: #ffffff; border: none; border-radius: 4px; }
         .error { color: #b00020; margin-bottom: 16px; }
@@ -24,10 +26,13 @@
     <h1>METAR Weather Reader</h1>
     <p class="intro">Enter an airport code (e.g. KJFK, EGLL) to get a plain-English weather report.</p>
 
-    <form action="/metar" method="get">
-        <input type="text" name="airport_code" placeholder="Airport code" value="{{ airport_code }}" maxlength="4" required autofocus>
-        <button type="submit">Get Weather</button>
-    </form>
+    <div class="input-box">
+        <label for="airport_code">Airport Code (ICAO):</label>
+        <form action="/metar" method="get">
+            <input type="text" id="airport_code" name="airport_code" placeholder="Airport code" value="{{ airport_code }}" maxlength="4" required autofocus>
+            <button type="submit">Get Weather</button>
+        </form>
+    </div>
 
     {% if error %}
         <p class="error">{{ error }}</p>
