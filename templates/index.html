@@ -6,8 +6,25 @@
     <title>METAR Weather Reader</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <style>
-        body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
-        h1 { font-size: 1.5rem; text-align: center; }
+        body {
+            font-family: -apple-system, Segoe UI, Arial, sans-serif;
+            color: #1a1a1a;
+            margin: 0;
+            min-height: 100vh;
+            padding: 40px 16px;
+            background: linear-gradient(135deg, #2b6cff 0%, #7b3fe4 100%);
+            display: flex;
+            justify-content: center;
+        }
+        .card {
+            background: #ffffff;
+            max-width: 640px;
+            width: 100%;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 { font-size: 1.5rem; text-align: center; margin-top: 0; }
         .input-box { background: #f5f0fb; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
         .input-box label { display: block; font-weight: bold; margin-bottom: 8px; }
         form { display: flex; flex-direction: column; gap: 8px; }
@@ -23,6 +40,7 @@
     </style>
 </head>
 <body>
+    <div class="card">
     <h1>METAR Weather Reader</h1>
     <p class="intro">Enter an airport code (e.g. KJFK, EGLL) to get a plain-English weather report.</p>
 
@@ -53,6 +71,7 @@
     <div class="about">
         <h2>What is METAR?</h2>
         <p>METAR is a standard weather report format used in aviation. This tool converts the cryptic METAR codes into plain English so you can easily understand current weather conditions at any airport.</p>
+    </div>
     </div>
 </body>
 </html>
