@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAR Reader</title>
+    <title>METAR Weather Reader</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <style>
         body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <h1>METAR Reader</h1>
+    <h1>METAR Weather Reader</h1>
     <p>Enter an airport code (e.g. KJFK, EGLL) to get a plain-English weather report.</p>
 
     <form action="/metar" method="get">
