@@ -132,21 +132,59 @@ def _decode_altimeter(token: str) -> str:
     return None
 
 
+def _capitalize_first_letter(value: str) -> str:
+    """Capitalize value's first character if it's a letter, e.g. for table display."""
+    if value and value[0].isalpha():
+        return value[0].upper() + value[1:]
+    return value
+
+
+def _strip_redundant_label(label: str, value: str) -> str:
+    """Trim a decoded phrase's leading category words for table display.
+
+    Decoded phrases like "wind 6 mph from the SSE" repeat the category
+    name that a table's label column already shows, so drop it there.
+    """
+    if label == "Temperature / Dew Point":
+        return value.replace("temperature ", "").replace(", dew point ", " / ")
+    prefix = label.lower() + " "
+    return value[len(prefix):] if value.lower().startswith(prefix) else value
+
+
+FIELD_DECODERS = (
+    ("Wind", _decode_wind),
+    ("Visibility", _decode_visibility),
+    ("Weather", _decode_weather),
+    ("Sky Condition", _decode_sky),
+    ("Temperature / Dew Point", _decode_temp_dewpoint),
+    ("Altimeter", _decode_altimeter),
+)
+
+
 def decode_metar(raw_text: str) -> dict:
     """Decode a raw METAR string into structured plain-English parts.
 
-    Returns a dict with 'station', 'observed_at', 'summary_sentence', and
-    'details' (list of decoded phrases). Unknown/unparsed tokens are ignored.
+    Returns a dict with 'station', 'observed_at', 'summary_sentence',
+    'details' (list of decoded phrases), and 'fields' (list of
+    {'label', 'value'} dicts, one per weather category, for tabular
+    display). Unknown/unparsed tokens are ignored.
     """
     tokens = raw_text.strip().split()
     if tokens and tokens[0] in ("METAR", "SPECI"):
         tokens = tokens[1:]
     if not tokens:
-        return {"station": None, "observed_at": None, "details": [], "summary_sentence": "No data available."}
+        return {
+            "station": None,
+            "observed_at": None,
+            "details": [],
+            "fields": [],
+            "summary_sentence": "No data available.",
+        }
 
     station = tokens[0] if re.match(r"^[A-Z0-9]{3,4}$", tokens[0]) else None
     observed_at = None
     details = []
+    field_values = {}
 
     for token in tokens[1:]:
         if re.match(r"^\d{6}Z$", token):
@@ -158,17 +196,23 @@ def decode_metar(raw_text: str) -> dict:
                 break
             continue
 
-        for decoder in (_decode_wind, _decode_visibility, _decode_weather, _decode_sky, _decode_temp_dewpoint, _decode_altimeter):
+        for label, decoder in FIELD_DECODERS:
             result = decoder(token)
             if result:
                 details.append(result)
+                field_values.setdefault(label, []).append(result)
                 break
 
+    fields = [
+        {"label": label, "value": _capitalize_first_letter(_strip_redundant_label(label, "; ".join(values)))}
+        for label, values in field_values.items()
+    ]
     summary_sentence = format_summary(details)
     return {
         "station": station,
         "observed_at": observed_at,
         "details": details,
+        "fields": fields,
         "summary_sentence": summary_sentence,
     }
 

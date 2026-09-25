@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAR Weather Reader &mdash; {{ result.decoded.station }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <style>
+        body {
+            font-family: -apple-system, Segoe UI, Arial, sans-serif;
+            color: #1a1a1a;
+            margin: 0;
+            min-height: 100vh;
+            padding: 40px 16px;
+            background: linear-gradient(135deg, #2b6cff 0%, #7b3fe4 100%);
+            display: flex;
+            justify-content: center;
+        }
+        .card {
+            background: #ffffff;
+            max-width: 640px;
+            width: 100%;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 { font-size: 1.5rem; text-align: center; margin-top: 0; }
+        button, .button {
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: #0b5fff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .summary { font-size: 1.1rem; background: #f0f6ff; padding: 16px; border-radius: 8px; }
+        .weather-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .weather-table th, .weather-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
+        .weather-table th { width: 40%; font-weight: bold; color: #444; }
+        .raw { font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all; }
+        .details { margin-top: 24px; margin-bottom: 24px; }
+        .return-box { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+    <h1>METAR Weather Reader</h1>
+
+    <div class="summary">
+        <strong>{{ result.decoded.station }}</strong>
+        {% if result.decoded.observed_at %}&mdash; Observed {{ result.decoded.observed_at }}{% endif %}
+    </div>
+
+    <table class="weather-table">
+        <tbody>
+        {% for field in result.decoded.fields %}
+            <tr>
+                <th scope="row">{{ field.label }}</th>
+                <td>{{ field.value }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="details">
+        <p><em>Raw METAR:</em></p>
+        <p class="raw">{{ result.raw }}</p>
+    </div>
+
+    <div class="return-box">
+        <a class="button" href="{{ url_for('index') }}">Return</a>
+    </div>
+    </div>
+</body>
+</html>
