@@ -17,14 +17,28 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("metar_reader")
 
+# Public, unauthenticated METAR API (see https://aviationweather.gov/data/api/).
 METAR_API_URL = "https://aviationweather.gov/api/data/metar"
-# ICAO airport codes are 4 alphanumeric characters (e.g. KJFK, EGLL).
+# ICAO/IATA airport codes are 3-4 alphanumeric characters (e.g. KJFK, EGLL).
 AIRPORT_CODE_PATTERN = re.compile(r"^[A-Z0-9]{3,4}$")
 REQUEST_TIMEOUT_SECONDS = 5
 
 
 def fetch_metar(airport_code: str) -> str:
-    """Fetch the raw METAR text for a validated airport code, or None."""
+    """Fetch the raw METAR text for a validated airport code.
+
+    Args:
+        airport_code: A 3-4 character ICAO/IATA airport code, already
+            validated against ``AIRPORT_CODE_PATTERN``.
+
+    Returns:
+        The raw METAR report text, or None if the API returned no data
+        for the given airport code.
+
+    Raises:
+        requests.RequestException: If the request to the weather API
+            fails (network error, timeout, or non-2xx response).
+    """
     response = requests.get(
         METAR_API_URL,
         params={"ids": airport_code, "format": "raw"},
@@ -37,11 +51,18 @@ def fetch_metar(airport_code: str) -> str:
 
 @app.route("/", methods=["GET"])
 def index():
+    """Render the empty input form."""
     return render_template("index.html", result=None, error=None, airport_code="")
 
 
 @app.route("/metar", methods=["GET"])
 def metar():
+    """Look up and decode the METAR for the requested airport code.
+
+    Reads ``airport_code`` from the query string, validates it, fetches
+    the raw METAR, decodes it into plain English, and re-renders the
+    form with either a result or an error message.
+    """
     airport_code = request.args.get("airport_code", "").strip().upper()
 
     if not AIRPORT_CODE_PATTERN.match(airport_code):
